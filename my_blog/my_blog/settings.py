@@ -23,9 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '=hoo80l9)%kn4v_!qa$d%l8%e+&kh9gdr$()!$tay_sg=li*md'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['47.108.115.199']
+# ALLOWED_HOSTS = ['47.108.115.199']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -122,6 +123,6 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATIC_URL = '/static/'

@@ -9,4 +9,5 @@ urlpatterns = [
     # 目前还没有urls
     path('resume-list/', views.resume_list, name='resume_list'),
     path('resume-detail/<int:id>/', views.resume_detail, name='resume_detail'),
+    path('resume-analyse/', views.resume_analyse, name='resume_analyse'),
 ]

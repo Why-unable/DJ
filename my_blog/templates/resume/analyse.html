@@ -1,0 +1,69 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %}
+{% load staticfiles %}
+
+<!-- 写入 base.html 中定义的 title -->
+{% block title %}
+    简历分析
+{% endblock title %}
+
+<!-- 写入 base.html 中定义的 content -->
+{% block content %}
+
+
+<!-- 文章详情 -->
+<div class="container">
+
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <!-- 文件选择器 -->
+                <div class="input-group">
+                    <input type="file" class="form-control" id="file_selector" name="file_selector">
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <!-- 提交按钮 -->
+                <button type="submit" class="btn btn-primary">提交</button>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="row">
+      <div class="col-12">
+        <button class="btn btn-primary" id="collapseButton1" type="button" data-toggle="collapse" data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1" onclick="toggleButtonText(1)">
+          查看简历
+        </button>
+      </div>
+      <div class="col-12">
+        <div class="collapse" id="collapseExample1">
+          <div class="card card-body">
+            这是折叠框中的内容+{{text}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <button class="btn btn-primary" id="collapseButton2" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2" onclick="toggleButtonText(2)">
+          查看分析
+        </button>
+      </div>
+      <div class="col-12">
+        <div class="collapse" id="collapseExample2">
+          <div class="card card-body">
+            这是折叠框中的内容+{{text}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+{% endblock content %}
