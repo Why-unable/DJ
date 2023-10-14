@@ -1,5 +1,4 @@
 body {
-  background-image: url('../images/background.jpeg');
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-image: url('../images/white_p.jpeg'); /* command+shift+R强制刷新页面便可以看到图片更改*/
+  background-repeat: repeat;
 }

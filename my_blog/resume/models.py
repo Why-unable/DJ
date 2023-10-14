@@ -29,3 +29,4 @@ class ResumeShow(models.Model):
     def __str__(self):
         # return self.title 将文章标题返回
         return self.title
+

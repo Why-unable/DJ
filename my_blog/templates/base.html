@@ -52,19 +52,18 @@
     </script>
 
     <script>
-    function toggleButtonText(button_number) {
+    function toggleButtonText(button_text,button_number) {
+
       var button = document.getElementById("collapseButton"+button_number);
       var collapse = document.getElementById("collapseExample"+button_number);
 
       if (collapse.classList.contains('show')) {
-        button.innerHTML = "点击查看";
+        button.innerHTML = button_text;
       } else {
         button.innerHTML = "收回";
       }
     }
     </script>
-
-
 
     <script src='resume/analyse.js'></script>
 
