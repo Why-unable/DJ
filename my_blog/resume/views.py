@@ -8,6 +8,8 @@ import PyPDF2
 import tempfile
 import docx
 # 视图函数
+from django.utils.html import linebreaks
+
 from .models import ResumeShow
 
 
@@ -66,7 +68,9 @@ def resume_analyse(request):
         text = "未选择文件"
         print(text)
 
-    context = {'text': text}
+    text_score = get_label_score(text)
+    # print(text_score)
+    context = {'text': text_score}
     return render(request, 'resume/analyse.html', context)
 
 
@@ -88,3 +92,50 @@ def read_doc_content(file_path):
     paragraphs = [p.text for p in doc.paragraphs]
     content = "\n".join(paragraphs)
     return content
+
+
+def get_label_score(text):
+    split_text = split_the_text(text)
+    # 对于每一个句子，得到其分类：
+    # text_label=get_label(every_text)
+    # text_score=get_score(text_label)
+    # return score_text
+    return split_text
+
+
+def split_the_text(text):
+    sentences = []
+    temp_sentence = ""
+    temp_length = 0
+
+    for char in text:
+        temp_sentence += char
+        temp_length += 1
+
+        if char in ['。', '；', ';']:
+            sentences.append(temp_sentence.strip())
+            temp_sentence = ""
+            temp_length = 0
+        elif temp_length >= 30 and '，' in temp_sentence:
+            parts = temp_sentence.split('，', 1)
+            sentences.append(parts[0].strip())
+            temp_sentence = parts[1].strip()
+            temp_length = len(temp_sentence)
+
+    if temp_sentence:
+        sentences.append(temp_sentence.strip())
+
+    return sentences
+
+
+def get_label():
+    text_label = []
+    # ...
+
+    return text_label
+
+
+def get_score():
+    text_score = []
+    # ...
+    return text_score
