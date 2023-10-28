@@ -1,7 +1,11 @@
+import re
+
 from django.shortcuts import render
 
 # Create your views here.
-
+import sys
+import torch.nn as nn
+from .eval_model.label import Label
 from django.http import HttpResponse
 import os
 import PyPDF2
@@ -9,7 +13,7 @@ import tempfile
 import docx
 # 视图函数
 from django.utils.html import linebreaks
-
+from .eval_model.eval_MLP import ImprovedMLP
 from .models import ResumeShow
 
 
@@ -69,9 +73,91 @@ def resume_analyse(request):
         print(text)
 
     text_score = get_label_score(text)
+    # print("我马上就要给前端的（resume——analyse）")
     # print(text_score)
     context = {'text': text_score}
     return render(request, 'resume/analyse.html', context)
+
+
+# ===================  两行等号内的函数为resume_analyse服务  =====================
+
+def get_label_score(text):
+    split_text = split_the_text(text)
+    # 对于每一个句子，得到其分类：
+    text_label = get_label(split_text)
+    # text_score=get_score(text_label)
+    # return score_text
+    # return text_label
+
+    return text_label
+
+
+def split_the_text(text):
+    sentences = []
+    temp_sentence = ""
+    temp_length = 0
+
+    for char in text:
+        temp_sentence += char
+        temp_length += 1
+
+        if char in ['。', '；', ';',',','，']:  # 现在是根据这些分割
+            if temp_length >= 10:
+                sentences.append(temp_sentence.strip())
+                temp_sentence = ""
+                temp_length = 0
+        elif temp_length >= 40:
+            sentences.append(temp_sentence.strip())
+            temp_sentence = ""
+            temp_length = 0
+
+    if temp_sentence:
+        sentences.append(temp_sentence.strip())
+    # print("split_the_text后的：")
+    for i in range(len(sentences)):
+        print(sentences[i])
+    # print(sentences)
+    return sentences
+
+
+def get_label(texts):
+    # ...
+    my_label = Label()
+    text_label = my_label.get_label(texts)
+    text_label_name = get_label_name(text_label)
+    return text_label_name
+
+
+def get_label_name(texts):
+    mapping_file = "resume/eval_model/label.txt"
+    # 加载映射文件并创建字典
+    mapping = {}
+    with open(mapping_file, "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                label, word = line.split(",", 1)
+                mapping[int(label)] = word
+
+    pattern = r"(\d+)-(\d+)$"
+    text_name = []
+    for text in texts:
+        text_ori=text[:-4]
+        text_label_part=text[-4:]
+        matches = re.findall(pattern, text_label_part)
+        if matches:
+            numbers = [int(match[0]) for match in matches] + [int(match[1]) for match in matches]
+            text_ori += "-" + mapping[numbers[0]]
+            text_ori += '-' + mapping[(numbers[0] + 1) * 10 + numbers[1]]
+            text_name.append(text_ori)
+    print("加上名字的：", text_name)
+    return text_name
+
+
+def get_score():
+    text_score = []
+    # ...
+    return text_score
 
 
 def read_pdf_content(file):
@@ -93,49 +179,4 @@ def read_doc_content(file_path):
     content = "\n".join(paragraphs)
     return content
 
-
-def get_label_score(text):
-    split_text = split_the_text(text)
-    # 对于每一个句子，得到其分类：
-    # text_label=get_label(every_text)
-    # text_score=get_score(text_label)
-    # return score_text
-    return split_text
-
-
-def split_the_text(text):
-    sentences = []
-    temp_sentence = ""
-    temp_length = 0
-
-    for char in text:
-        temp_sentence += char
-        temp_length += 1
-
-        if char in ['。', '；', ';']:
-            sentences.append(temp_sentence.strip())
-            temp_sentence = ""
-            temp_length = 0
-        elif temp_length >= 30 and '，' in temp_sentence:
-            parts = temp_sentence.split('，', 1)
-            sentences.append(parts[0].strip())
-            temp_sentence = parts[1].strip()
-            temp_length = len(temp_sentence)
-
-    if temp_sentence:
-        sentences.append(temp_sentence.strip())
-
-    return sentences
-
-
-def get_label():
-    text_label = []
-    # ...
-
-    return text_label
-
-
-def get_score():
-    text_score = []
-    # ...
-    return text_score
+# ===================  两行等号内的函数为resume_analyse服务  =====================

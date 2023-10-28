@@ -41,11 +41,14 @@
       </div>
       <div class="col-12">
         <div class="collapse" id="collapseExample1">
-          <div class="card card-body">
-            {% for line in text %}
-                {{ line|linebreaksbr }}
-            {% endfor %}
-          </div>
+            <div class="card card-body">
+              {% for line in text %}
+                <div style="display: block;">
+                  {{ line|linebreaksbr }}
+                </div>
+                <br> <!-- 添加空行 -->
+              {% endfor %}
+            </div>
         </div>
       </div>
     </div>

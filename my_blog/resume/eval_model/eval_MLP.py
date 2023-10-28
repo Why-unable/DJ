@@ -2,7 +2,7 @@ import torch.nn as nn
 
 
 class ImprovedMLP(nn.Module):
-    def __init__(self, input_dim, hidden_dims, output_dim, dropout_rate=0.5):
+    def __init__(self, input_dim=10, hidden_dims=[10,20], output_dim=3, dropout_rate=0.5):
         super(ImprovedMLP, self).__init__()
 
         # 添加更多的隐藏层

@@ -2,6 +2,9 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from resume.eval_model.eval_MLP import ImprovedMLP
+from gensim.models import Doc2Vec
+import jieba
 
 
 def main():

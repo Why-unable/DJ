@@ -1,0 +1,86 @@
+0
+# 定义doc2vec
+train_vector_size = 40
+train_window = 5
+train_alpha = 0.05
+train_min_count = 1
+train_workers = 4
+train_epochs = 40
+
+get_alpha = 0.05
+get_epochs = 250
+
+# 定义模型超参数
+num_classes = 3  # 类别数量
+input_dim = train_vector_size
+hidden_dims = [256, 128, 64]
+dropout_rate = 0.2
+hidden_dim = 55
+output_dim = num_classes
+
+
+1
+    doc_model = Doc2Vec(vector_size=40, window=10, alpha=0.01, min_count=1, workers=4, epochs=300)
+    doc_model.build_vocab(tagged_documents)
+    doc_model.train(tagged_documents, total_examples=doc_model.corpus_count, epochs=doc_model.epochs)
+    return doc_model
+
+
+# doc2vec模型训练
+train_doc2vec_model = train_doc2vec(train_data)
+# alpha=0.025, steps=20, min_alpha=0.0001, seed=42
+train_vectors = [train_doc2vec_model.infer_vector(text, alpha=0.01, epochs=300) for text in train_data['text'].apply(tokenize)]
+test_vectors = [train_doc2vec_model.infer_vector(text, alpha=0.01, epochs=300) for text in test_data['text'].apply(tokenize)]
+# get：alpha=0.01, epochs=250
+# 定义模型超参数
+num_classes = 3  # 类别数量
+input_dim = 40
+hidden_dims = [64, 48, 48]
+dropout_rate = 0.39
+hidden_dim = 55
+output_dim = num_classes
+2
+doc_model  yue= 1
+train_vectors = [train_doc2vec_model.infer_vector(text, alpha=0.01, epochs=200) for text in train_data['text'].apply(tokenize)]
+test_vectors = [train_doc2vec_model.infer_vector(text, alpha=0.01, epochs=200) for text in test_data['text'].apply(tokenize)]
+# get：alpha=0.02, epochs=250
+# 定义模型超参数
+num_classes = 3  # 类别数量
+input_dim = 20
+hidden_dims = [60, 60, 60]
+dropout_rate = 0.4
+hidden_dim = 55
+output_dim = num_classes
+
+3
+    doc_model = Doc2Vec(vector_size=20, window=8, alpha=0.01, min_count=1, workers=4, epochs=500)
+    doc_model.build_vocab(tagged_documents)
+    doc_model.train(tagged_documents, total_examples=doc_model.corpus_count, epochs=doc_model.epochs)
+    return doc_model
+
+
+# doc2vec模型训练
+train_doc2vec_model = train_doc2vec(train_data)
+# alpha=0.025, steps=20, min_alpha=0.0001, seed=42
+train_vectors = [train_doc2vec_model.infer_vector(text, alpha=0.01, epochs=300) for text in train_data['text'].apply(tokenize)]
+test_vectors = [train_doc2vec_model.infer_vector(text, alpha=0.01, epochs=300) for text in test_data['text'].apply(tokenize)]
+# get：alpha=0.01, epochs=250
+# 定义模型超参数
+num_classes = 3  # 类别数量
+input_dim = 20
+hidden_dims = [60, 60, 60]
+dropout_rate = 0.4
+hidden_dim = 55
+output_dim = num_classes
+
+needed:   Manually add data（too little）
+
+
+
+
+pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple  torch
+
+install gensim 时，遇到错误找不到openblas，使用了命令：export PKG_CONFIG_PATH="/opt/homebrew/opt/openblas/lib/pkgconfig"解决
+
+
+Pillow==5.3.0
