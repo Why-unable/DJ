@@ -62,9 +62,12 @@
       <div class="col-12">
         <div class="collapse" id="collapseExample2">
           <div class="card card-body">
-            {% for line in text %}
-                {{ line|linebreaksbr }}
-            {% endfor %}
+            {% for line in score %}
+                <div style="display: block;">
+                  {{ line|linebreaksbr }}
+                </div>
+                <br> <!-- 添加空行 -->
+              {% endfor %}
           </div>
         </div>
       </div>

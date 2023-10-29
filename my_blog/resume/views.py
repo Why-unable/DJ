@@ -11,6 +11,7 @@ import os
 import PyPDF2
 import tempfile
 import docx
+import pandas as pd
 # 视图函数
 from django.utils.html import linebreaks
 from .eval_model.eval_MLP import ImprovedMLP
@@ -72,10 +73,13 @@ def resume_analyse(request):
         text = "未选择文件"
         print(text)
 
-    text_score = get_label_score(text)
+    text_label, avg_score = get_label_score(text)
     # print("我马上就要给前端的（resume——analyse）")
     # print(text_score)
-    context = {'text': text_score}
+    context = {
+        'text': text_label,
+        'score': avg_score
+    }
     return render(request, 'resume/analyse.html', context)
 
 
@@ -84,12 +88,35 @@ def resume_analyse(request):
 def get_label_score(text):
     split_text = split_the_text(text)
     # 对于每一个句子，得到其分类：
-    text_label = get_label(split_text)
+    text_label, text_simi, labels = get_label(split_text)
+    print(labels)
     # text_score=get_score(text_label)
     # return score_text
     # return text_label
-
-    return text_label
+    top_simi = []
+    for i in range(len(text_simi)):
+        top_simi.append(text_simi[i][0])
+    total_score = [[], [], [], [], [], [], [], []]
+    mapping_file = "resume/eval_model/weight.txt"
+    # 加载映射文件并创建字典
+    mapping = {}
+    with open(mapping_file, "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                label, weight = line.split(",", 1)
+                mapping[int(label)] = float(weight)
+    for i in range(len(top_simi)):
+        ture_label=(labels[i]//10-1)*3 + labels[i]%10
+        total_score[ture_label].append(top_simi[i]*mapping[labels[i]])
+    avg_score=[]
+    for t_score in total_score:
+        if len(t_score) == 0:
+            avg_score.append(0)
+        else:
+            avg_score.append(sum(t_score) / len(t_score))
+    avg_score.append(sum(avg_score))
+    return text_label, avg_score
 
 
 def split_the_text(text):
@@ -98,34 +125,34 @@ def split_the_text(text):
     temp_length = 0
 
     for char in text:
-        temp_sentence += char
-        temp_length += 1
+        if char not in [' ', '\n']:
+            temp_sentence += char
+            temp_length += 1
 
-        if char in ['。', '；', ';',',','，']:  # 现在是根据这些分割
-            if temp_length >= 10:
+        if char in ['。', '!', ';', '；']:
+            if temp_length >= 16 or char in ['。', '!']:
                 sentences.append(temp_sentence.strip())
                 temp_sentence = ""
                 temp_length = 0
-        elif temp_length >= 40:
+        elif temp_length >= 60 and char in [',', '，']:
             sentences.append(temp_sentence.strip())
             temp_sentence = ""
             temp_length = 0
 
     if temp_sentence:
         sentences.append(temp_sentence.strip())
-    # print("split_the_text后的：")
+    print("split_the_text后的：")
     for i in range(len(sentences)):
         print(sentences[i])
-    # print(sentences)
     return sentences
 
 
 def get_label(texts):
     # ...
     my_label = Label()
-    text_label = my_label.get_label(texts)
+    text_label, text_score, labels = my_label.get_label(texts)
     text_label_name = get_label_name(text_label)
-    return text_label_name
+    return text_label_name, text_score, labels
 
 
 def get_label_name(texts):
@@ -142,8 +169,8 @@ def get_label_name(texts):
     pattern = r"(\d+)-(\d+)$"
     text_name = []
     for text in texts:
-        text_ori=text[:-4]
-        text_label_part=text[-4:]
+        text_ori = text[:-4]
+        text_label_part = text[-4:]
         matches = re.findall(pattern, text_label_part)
         if matches:
             numbers = [int(match[0]) for match in matches] + [int(match[1]) for match in matches]

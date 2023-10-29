@@ -37,26 +37,28 @@ class Label:
             for text in texts:
                 # 获取向量表示
                 # print("get_vector前一步")
-                vector = sc1.get_vector(text, 0)
+                vector, simi = sc1.get_vector(text, 0)
                 # print("get_vector后一步")
                 # print(vector)
                 # 获取标签
-                dataset = CustomDataset([vector])
-                data_loader = DataLoader(dataset, batch_size=1, shuffle=False)
+                if vector[0] != -1:
+                    dataset = CustomDataset([vector])
+                    data_loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
-                self.lv1_model.eval()  # 将模型设置为评估模式
-                with torch.no_grad():
-                    for batch in data_loader:
-                        inputs, _ = batch
-                        outputs = self.lv1_model(inputs)
-                        predicted_labels = torch.argmax(outputs, dim=1)
-                        # print("Predicted Label:", predicted_labels.item())
-                        new_text=text + "-" + str(predicted_labels.item())
-                        text_label_lv1.append(new_text)
+                    self.lv1_model.eval()  # 将模型设置为评估模式
+                    with torch.no_grad():
+                        for batch in data_loader:
+                            inputs, _ = batch
+                            outputs = self.lv1_model(inputs)
+                            predicted_labels = torch.argmax(outputs, dim=1)
+                            new_text=text + "-" + str(predicted_labels.item())
+                            text_label_lv1.append(new_text)
             return text_label_lv1
 
         def get_label_lv2(text_label_lv1):
             text_label_lv2 = []
+            simis = []
+            labels=[]
             sc2 = Score()
             for text in text_label_lv1:
                 # 获取向量表示
@@ -64,29 +66,32 @@ class Label:
                 ori_text = text[:last_dash_index]
                 label_lv1= int(text[last_dash_index + 1:])
                 # print("第二次get_vector前一步")
-                vector = sc2.get_vector(ori_text, label_lv1+1)
+                vector, simi = sc2.get_vector(ori_text, label_lv1+1)
 
                 # 获取标签
-                dataset = CustomDataset([vector])
-                data_loader = DataLoader(dataset, batch_size=1, shuffle=False)
+                if vector[0] != -1:
+                    simis.append(simi)
+                    dataset = CustomDataset([vector])
+                    data_loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
-                self.lv1_model.eval()  # 将模型设置为评估模式
-                # print("第二次get_vector时，开始评估的前一步")
-                with torch.no_grad():
-                    for batch in data_loader:
-                        inputs, _ = batch
-                        outputs=0
-                        if label_lv1==0:
-                            outputs = self.lv21_model(inputs)
-                        elif label_lv1==1:
-                            outputs = self.lv22_model(inputs)
-                        elif label_lv1==2:
-                            outputs = self.lv23_model(inputs)
-                        predicted_labels = torch.argmax(outputs, dim=1)
-                        # print("Predicted Label:", predicted_labels.item())
-                        new_text=text + "-" + str(predicted_labels.item())
-                        text_label_lv2.append(new_text)
-            return text_label_lv2
+                    self.lv1_model.eval()  # 将模型设置为评估模式
+                    # print("第二次get_vector时，开始评估的前一步")
+                    with torch.no_grad():
+                        for batch in data_loader:
+                            inputs, _ = batch
+                            outputs=0
+                            if label_lv1==0:
+                                outputs = self.lv21_model(inputs)
+                            elif label_lv1==1:
+                                outputs = self.lv22_model(inputs)
+                            elif label_lv1==2:
+                                outputs = self.lv23_model(inputs)
+                            predicted_labels = torch.argmax(outputs, dim=1)
+                            # print("Predicted Label:", predicted_labels.item())
+                            new_text=text + "-" + str(predicted_labels.item())
+                            text_label_lv2.append(new_text)
+                            labels.append((label_lv1+1)*10+predicted_labels.item())
+            return text_label_lv2, simis, labels
 
         # action(label)
         text_label_lv1 = get_label_lv1(texts)

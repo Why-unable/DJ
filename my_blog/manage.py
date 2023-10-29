@@ -7,6 +7,7 @@ from gensim.models import Doc2Vec
 import jieba
 
 
+
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_blog.settings')
     try:
