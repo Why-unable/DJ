@@ -73,9 +73,8 @@ def resume_analyse(request):
         text = "未选择文件"
         print(text)
 
-    text_label, avg_score = get_label_score(text)
-    # print("我马上就要给前端的（resume——analyse）")
-    # print(text_score)
+    #text_label, avg_score = get_label_score(text)
+    text_label, avg_score = ['666','999']
     context = {
         'text': text_label,
         'score': avg_score
@@ -96,7 +95,7 @@ def get_label_score(text):
     top_simi = []
     for i in range(len(text_simi)):
         top_simi.append(text_simi[i][0])
-    total_score = [[], [], [], [], [], [], [], []]
+    total_score = [[], [], [], [], [], [], [], [],[]]
     mapping_file = "resume/eval_model/weight.txt"
     # 加载映射文件并创建字典
     mapping = {}
