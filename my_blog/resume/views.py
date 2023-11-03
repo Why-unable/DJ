@@ -73,8 +73,8 @@ def resume_analyse(request):
         text = "未选择文件"
         print(text)
 
-    #text_label, avg_score = get_label_score(text)
-    text_label, avg_score = ['666','999']
+    text_label, avg_score = get_label_score(text)
+    #text_label, avg_score = ['666','999']
     context = {
         'text': text_label,
         'score': avg_score
