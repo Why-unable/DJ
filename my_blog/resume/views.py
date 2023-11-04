@@ -5,6 +5,8 @@ from django.shortcuts import render
 # Create your views here.
 import sys
 import torch.nn as nn
+from . import models
+# from .models import ImprovedMLP
 from .eval_model.label import Label
 from django.http import HttpResponse
 import os
@@ -14,8 +16,8 @@ import docx
 import pandas as pd
 # 视图函数
 from django.utils.html import linebreaks
-from .eval_model.eval_MLP import ImprovedMLP
 from .models import ResumeShow
+
 
 
 def resume_list(request):
@@ -74,9 +76,11 @@ def resume_analyse(request):
         print(text)
     try:
         text_label, avg_score = get_label_score(text)
+
     except Exception as e:
         print(e)
         text_label, avg_score = ['666', '999']
+
     context = {
         'text': text_label,
         'score': avg_score

@@ -1,9 +1,35 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-from resume.eval_model.eval_MLP import ImprovedMLP
+# from ..models import ImprovedMLP
 
 from resume.doc2vec.score import Score
+
+import torch.nn as nn
+
+
+class ImprovedMLP(nn.Module):
+    def __init__(self, input_dim, hidden_dims, output_dim, dropout_rate):
+        super(ImprovedMLP, self).__init__()
+
+        # 添加更多的隐藏层
+        self.hidden_layers = nn.ModuleList()
+        prev_dim = input_dim
+        for hidden_dim in hidden_dims:
+            self.hidden_layers.append(nn.Linear(prev_dim, hidden_dim))
+            self.hidden_layers.append(nn.ReLU())
+            self.hidden_layers.append(nn.BatchNorm1d(hidden_dim))
+            self.hidden_layers.append(nn.Dropout(dropout_rate))
+            prev_dim = hidden_dim
+
+        # 输出层
+        self.output_layer = nn.Linear(hidden_dims[-1], output_dim)
+
+    def forward(self, x):
+        for layer in self.hidden_layers:
+            x = layer(x)
+        x = self.output_layer(x)
+        return x
 
 
 class CustomDataset:
@@ -19,11 +45,14 @@ class CustomDataset:
 
 class Label:
     def __init__(self):
-        # self.improved_mlp = improved_mlp
-        self.lv1_model = torch.load('resume/eval_model/1017_2037/0model_accuracy_0.728.pt')
-        self.lv21_model = torch.load('resume/eval_model/1017_2037/1model_accuracy_0.725.pt')
-        self.lv22_model = torch.load('resume/eval_model/1017_2037/2model_accuracy_0.681.pt')
-        self.lv23_model = torch.load('resume/eval_model/1017_2037/3model_accuracy_0.750.pt')
+        self.imlp=ImprovedMLP(1,[1,1],1,1)
+        try:
+            self.lv1_model = torch.load('resume/eval_model/1017_2037/0model_accuracy_0.728.pt')
+            self.lv21_model = torch.load('resume/eval_model/1017_2037/1model_accuracy_0.725.pt')
+            self.lv22_model = torch.load('resume/eval_model/1017_2037/2model_accuracy_0.681.pt')
+            self.lv23_model = torch.load('resume/eval_model/1017_2037/3model_accuracy_0.750.pt')
+        except Exception as e:
+            print("label_init_error:", e)
         # model加载
 
     def get_label(self, texts):
