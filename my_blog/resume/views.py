@@ -72,9 +72,11 @@ def resume_analyse(request):
     else:
         text = "未选择文件"
         print(text)
-
-    text_label, avg_score = get_label_score(text)
-    #text_label, avg_score = ['666','999']
+    try:
+        text_label, avg_score = get_label_score(text)
+    except Exception as e:
+        print(e)
+        text_label, avg_score = ['666', '999']
     context = {
         'text': text_label,
         'score': avg_score
@@ -95,7 +97,7 @@ def get_label_score(text):
     top_simi = []
     for i in range(len(text_simi)):
         top_simi.append(text_simi[i][0])
-    total_score = [[], [], [], [], [], [], [], [],[]]
+    total_score = [[], [], [], [], [], [], [], [], []]
     mapping_file = "resume/eval_model/weight.txt"
     # 加载映射文件并创建字典
     mapping = {}
@@ -106,9 +108,9 @@ def get_label_score(text):
                 label, weight = line.split(",", 1)
                 mapping[int(label)] = float(weight)
     for i in range(len(top_simi)):
-        ture_label=(labels[i]//10-1)*3 + labels[i]%10
-        total_score[ture_label].append(top_simi[i]*mapping[labels[i]])
-    avg_score=[]
+        ture_label = (labels[i] // 10 - 1) * 3 + labels[i] % 10
+        total_score[ture_label].append(top_simi[i] * mapping[labels[i]])
+    avg_score = []
     for t_score in total_score:
         if len(t_score) == 0:
             avg_score.append(0)
