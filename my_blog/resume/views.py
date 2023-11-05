@@ -122,9 +122,10 @@ def get_label_score(text):
         total_score[ture_label].append(top_simi[i] * mapping[labels[i]])
     avg_score = []
     for t_score in total_score:
-        if len(t_score) == 0:
+        if len(t_score) == 0 or sum(t_score) / len(t_score)<6:
             avg_score.append(6)
         else:
+
             avg_score.append(sum(t_score) / len(t_score))
     avg_score=[round(ascore, 2) for ascore in avg_score]
 
