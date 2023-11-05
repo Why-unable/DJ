@@ -1,0 +1,32 @@
+0
+# 定义模型超参数
+num_classes = 3  # 类别数量
+input_dim = train_vector_size
+hidden_dims = [280, 280, 240]
+dropout_rate = 0.5
+hidden_dim = 60
+output_dim = num_classes
+
+1
+num_classes = 3  # 类别数量
+input_dim = train_vector_size
+hidden_dims = [128, 80, 80]
+dropout_rate = 0.3
+hidden_dim = 60
+output_dim = num_classes
+
+2
+
+3
+
+doc2vec
+# 定义doc2vec
+train_vector_size = 50
+train_window = 5
+train_alpha = 0.1
+train_min_count = 1
+train_workers = 4
+train_epochs = 200
+
+get_alpha = 0.1
+get_epochs = 100

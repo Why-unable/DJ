@@ -5,14 +5,23 @@ import pandas as pd
 
 class Score:
     def __init__(self):
-        self.cans0 = [0.05, 250]
-        self.cans1 = [0.01, 300]
-        self.cans2 = [0.01, 200]
-        self.cans3 = [0.01, 300]
-        self.model0 = Doc2Vec.load('resume/doc2vec/1017_2037/doc2vec_model0.bin')
-        self.model1 = Doc2Vec.load('resume/doc2vec/1017_2037/doc2vec_model1.bin')
-        self.model2 = Doc2Vec.load('resume/doc2vec/1017_2037/doc2vec_model2.bin')
-        self.model3 = Doc2Vec.load('resume/doc2vec/1017_2037/doc2vec_model3.bin')
+        # self.cans0 = [0.05, 250]
+        # self.cans1 = [0.01, 300]
+        # self.cans2 = [0.01, 200]
+        # self.cans3 = [0.01, 300]
+        self.cans0 = [0.1, 100]
+        self.cans1 = self.cans0
+        self.cans2 = self.cans0
+        self.cans3 = self.cans0
+        # self.model0 = Doc2Vec.load('resume/doc2vec/1017_2037/doc2vec_model0.bin')
+        # self.model1 = Doc2Vec.load('resume/doc2vec/1017_2037/doc2vec_model1.bin')
+        # self.model2 = Doc2Vec.load('resume/doc2vec/1017_2037/doc2vec_model2.bin')
+        # self.model3 = Doc2Vec.load('resume/doc2vec/1017_2037/doc2vec_model3.bin')
+
+        self.model0 = Doc2Vec.load('resume/doc2vec/1104_2256/doc2vec_model1104.bin')
+        self.model1 = self.model0
+        self.model2 = self.model0
+        self.model3 = self.model0
         self.stopwords = []
         with open('resume/doc2vec/stop_list.txt', 'r', encoding='utf-8') as file:
             for line in file:
@@ -37,10 +46,8 @@ class Score:
                 # print(train_data['text'][doc_id])
                 # print("Similarity:", similarity)
                 simi.append(similarity)
-                if similarity > 0.55:
+                if similarity > 0.45 and doc_id < 1904:
                     have = True
-                # else :
-                #     print(0,similarity)
 
         elif type == 1:
             train_file = 'resume/doc2vec/sentences/1013data1/total/train.csv'
@@ -80,32 +87,36 @@ class Score:
 
     def get_vector(self, text, type):
 
-        tokenize_text = self.tokenize(text)
-        if type == 0:
-            vector = self.model0.infer_vector(tokenize_text, alpha=self.cans0[0], epochs=self.cans0[1])
-            have, simi = self.get_most_simi(vector, type)
-            if have:
-                return vector, simi
+        try:
+            tokenize_text = self.tokenize(text)
+            if type == 0:
+                vector = self.model0.infer_vector(tokenize_text, alpha=self.cans0[0], epochs=self.cans0[1])
+                have, simi = self.get_most_simi(vector, type)
+                if have:
+                    return vector, simi
 
-        elif type == 1:
-            vector = self.model1.infer_vector(tokenize_text, alpha=self.cans1[0], epochs=self.cans1[1])
-            have, simi = self.get_most_simi(vector, type)
-            if have:
-                return vector, simi
+            elif type == 1:
+                vector = self.model1.infer_vector(tokenize_text, alpha=self.cans1[0], epochs=self.cans1[1])
+                have, simi = self.get_most_simi(vector, type)
+                if have:
+                    return vector, simi
 
-        elif type == 2:
-            vector = self.model2.infer_vector(tokenize_text, alpha=self.cans2[0], epochs=self.cans2[1])
-            have, simi = self.get_most_simi(vector, type)
-            if have:
-                return vector, simi
+            elif type == 2:
+                vector = self.model2.infer_vector(tokenize_text, alpha=self.cans2[0], epochs=self.cans2[1])
+                have, simi = self.get_most_simi(vector, type)
+                if have:
+                    return vector, simi
 
-        elif type == 3:
-            vector = self.model3.infer_vector(tokenize_text, alpha=self.cans3[0], epochs=self.cans3[1])
-            have, simi = self.get_most_simi(vector, type)
-            if have:
-                return vector, simi
+            elif type == 3:
+                vector = self.model3.infer_vector(tokenize_text, alpha=self.cans3[0], epochs=self.cans3[1])
+                have, simi = self.get_most_simi(vector, type)
+                if have:
+                    return vector, simi
 
-        return [-1, -1], 0
+            return [-1, -1], 0
+
+        except Exception as e:
+            print("get_vector:", e)
 
     def get_simi(self, vector, type):
 

@@ -33,7 +33,7 @@ class ResumeShow(models.Model):
 
 
 class ImprovedMLP(nn.Module):
-    def __init__(self, input_dim, hidden_dims, output_dim, dropout_rate):
+    def __init__(self, input_dim=3, hidden_dims=[1,1], output_dim=2, dropout_rate=1):
         super(ImprovedMLP, self).__init__()
 
         # 添加更多的隐藏层

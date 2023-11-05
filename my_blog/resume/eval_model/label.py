@@ -45,14 +45,27 @@ class CustomDataset:
 
 class Label:
     def __init__(self):
-        self.imlp=ImprovedMLP(1,[1,1],1,1)
+        # try:
+        #     self.lv1_model = torch.load('resume/eval_model/1017_2037/0model_accuracy_0.728.pt')
+        #     self.lv21_model = torch.load('resume/eval_model/1017_2037/1model_accuracy_0.725.pt')
+        #     self.lv22_model = torch.load('resume/eval_model/1017_2037/2model_accuracy_0.681.pt')
+        #     self.lv23_model = torch.load('resume/eval_model/1017_2037/3model_accuracy_0.750.pt')
+        # except Exception as e:
+        #     print("label_init_error:", e)
         try:
-            self.lv1_model = torch.load('resume/eval_model/1017_2037/0model_accuracy_0.728.pt')
-            self.lv21_model = torch.load('resume/eval_model/1017_2037/1model_accuracy_0.725.pt')
-            self.lv22_model = torch.load('resume/eval_model/1017_2037/2model_accuracy_0.681.pt')
-            self.lv23_model = torch.load('resume/eval_model/1017_2037/3model_accuracy_0.750.pt')
+            self.lv1_model = ImprovedMLP(input_dim=50, hidden_dims=[280, 280, 240], output_dim=3, dropout_rate=0.5)
+            self.lv1_model.load_state_dict(torch.load('resume/eval_model/1104_2256/0acc_0.728_50_280280240_05.pt'))
+
+            self.lv21_model = ImprovedMLP(input_dim=50, hidden_dims=[128, 80, 80], output_dim=3, dropout_rate=0.3)
+            self.lv21_model.load_state_dict(torch.load('resume/eval_model/1104_2256/1acc_0.725_1288080_50_03.pt'))
+
+            self.lv22_model = ImprovedMLP(input_dim=50, hidden_dims=[50, 50, 50], output_dim=3, dropout_rate=0.2)
+            self.lv22_model.load_state_dict(torch.load('resume/eval_model/1104_2256/2acc_0.613_505050_50_0.2.pt'))
+            self.lv23_model = ImprovedMLP(input_dim=50, hidden_dims=[80, 80, 80], output_dim=3, dropout_rate=0.29)
+            self.lv23_model.load_state_dict(torch.load('resume/eval_model/1104_2256/3model_accuracy_0.625.pt'))
         except Exception as e:
-            print("label_init_error:", e)
+            print("banben2:", e)
+
         # model加载
 
     def get_label(self, texts):
@@ -70,6 +83,7 @@ class Label:
                 # print("get_vector后一步")
                 # print(vector)
                 # 获取标签
+
                 if vector[0] != -1:
                     dataset = CustomDataset([vector])
                     data_loader = DataLoader(dataset, batch_size=1, shuffle=False)
@@ -103,11 +117,14 @@ class Label:
                     dataset = CustomDataset([vector])
                     data_loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
-                    self.lv1_model.eval()  # 将模型设置为评估模式
+                    self.lv21_model.eval()  # 将模型设置为评估模式
+                    self.lv22_model.eval()
+                    self.lv23_model.eval()
                     # print("第二次get_vector时，开始评估的前一步")
                     with torch.no_grad():
                         for batch in data_loader:
                             inputs, _ = batch
+                            print('inputs',inputs)
                             outputs=0
                             if label_lv1==0:
                                 outputs = self.lv21_model(inputs)
@@ -116,16 +133,16 @@ class Label:
                             elif label_lv1==2:
                                 outputs = self.lv23_model(inputs)
                             predicted_labels = torch.argmax(outputs, dim=1)
-                            # print("Predicted Label:", predicted_labels.item())
+
                             new_text=text + "-" + str(predicted_labels.item())
                             text_label_lv2.append(new_text)
                             labels.append((label_lv1+1)*10+predicted_labels.item())
             return text_label_lv2, simis, labels
 
-        # action(label)
         text_label_lv1 = get_label_lv1(texts)
-        text_label_lv2 = get_label_lv2(text_label_lv1)
-        return text_label_lv2
+        text_label_lv2, simis, labels = get_label_lv2(text_label_lv1)
+
+        return text_label_lv2,simis,labels
 
 
 # label = Label()

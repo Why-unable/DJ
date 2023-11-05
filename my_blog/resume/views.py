@@ -74,12 +74,8 @@ def resume_analyse(request):
     else:
         text = "未选择文件"
         print(text)
-    try:
-        text_label, avg_score = get_label_score(text)
 
-    except Exception as e:
-        print(e)
-        text_label, avg_score = ['666', '999']
+    text_label, avg_score = get_label_score(text)
 
     context = {
         'text': text_label,
@@ -117,11 +113,19 @@ def get_label_score(text):
     avg_score = []
     for t_score in total_score:
         if len(t_score) == 0:
-            avg_score.append(0)
+            avg_score.append(6)
         else:
             avg_score.append(sum(t_score) / len(t_score))
-    avg_score.append(sum(avg_score))
-    return text_label, avg_score
+    avg_score=[round(ascore, 2) for ascore in avg_score]
+
+    label = ['战略思维', '创造性思维', '逻辑思维', '行动力', '领导力', '沟通能力', '道德与责任', '社交导向', '抗挫力']
+    weight = [10.99, 11.85, 11.92, 11.14, 10.94, 11.84, 11.19, 9.52, 10.61]
+    label_score = []
+    print(len(avg_score))
+    for i in range(len(avg_score)-1):
+        label_score.append(label[i]+":"+str(avg_score[i])+"/"+str(weight[i]))
+    label_score.append('总计：'+str(round(sum(avg_score),2))+"/"+str(100))
+    return label_score, label_score
 
 
 def split_the_text(text):
