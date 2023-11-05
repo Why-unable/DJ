@@ -47,6 +47,7 @@ def resume_analyse(request):
                 'text': '文件格式问题',
                 'score': '文件格式问题',
             }
+            return render(request, 'resume/analyse.html', context)
         if file:
             # 获取文件扩展名
             file_extension = os.path.splitext(file.name)[1].lower()
