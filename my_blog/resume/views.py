@@ -40,7 +40,13 @@ def resume_detail(request, id):
 
 def resume_analyse(request):
     if request.method == 'POST':
-        file = request.FILES.get('file_selector')
+        try:
+            file = request.FILES.get('file_selector')
+        except Exception as e:
+            context = {
+                'text': '文件格式问题',
+                'score': '文件格式问题',
+            }
         if file:
             # 获取文件扩展名
             file_extension = os.path.splitext(file.name)[1].lower()
@@ -74,8 +80,11 @@ def resume_analyse(request):
     else:
         text = "未选择文件"
         print(text)
-
-    text_label, avg_score = get_label_score(text)
+    try:
+        text_label, avg_score = get_label_score(text)
+    except Exception as e:
+        text_label=['something wrong']
+        avg_score=['something wrong']
 
     context = {
         'text': text_label,
