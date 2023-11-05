@@ -19,7 +19,6 @@ from django.utils.html import linebreaks
 from .models import ResumeShow
 
 
-
 def resume_list(request):
     # return HttpResponse("Hello World!")
     resumes = ResumeShow.objects.all()
@@ -84,8 +83,8 @@ def resume_analyse(request):
     try:
         text_label, avg_score = get_label_score(text)
     except Exception as e:
-        text_label=['something wrong']
-        avg_score=['something wrong']
+        text_label = ['something wrong']
+        avg_score = ['something wrong']
 
     context = {
         'text': text_label,
@@ -122,20 +121,22 @@ def get_label_score(text):
         total_score[ture_label].append(top_simi[i] * mapping[labels[i]])
     avg_score = []
     for t_score in total_score:
-        if len(t_score) == 0 or sum(t_score) / len(t_score)<6:
+        if len(t_score) == 0 or sum(t_score) / len(t_score) < 6:
             avg_score.append(6)
         else:
-
-            avg_score.append(sum(t_score) / len(t_score))
-    avg_score=[round(ascore, 2) for ascore in avg_score]
+            if(len(t_score)<=3):
+                avg_score.append(sum(t_score) / len(t_score))
+            else:
+                sum_score=
+    avg_score = [round(ascore, 2) for ascore in avg_score]
 
     label = ['战略思维', '创造性思维', '逻辑思维', '行动力', '领导力', '沟通能力', '道德与责任', '社交导向', '抗挫力']
     weight = [10.99, 11.85, 11.92, 11.14, 10.94, 11.84, 11.19, 9.52, 10.61]
     label_score = []
     print(len(avg_score))
-    for i in range(len(avg_score)-1):
-        label_score.append(label[i]+":"+str(avg_score[i])+"/"+str(weight[i]))
-    label_score.append('总计：'+str(round(sum(avg_score),2))+"/"+str(100))
+    for i in range(len(avg_score)):
+        label_score.append(label[i] + ":" + str(avg_score[i]) + "/" + str(weight[i]))
+    label_score.append('总计：' + str(round(sum(avg_score), 2)) + "/" + str(100))
     return label_score, label_score
 
 
