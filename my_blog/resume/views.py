@@ -116,6 +116,7 @@ def get_label_score(text):
             if line:
                 label, weight = line.split(",", 1)
                 mapping[int(label)] = float(weight)
+
     for i in range(len(top_simi)):
         ture_label = (labels[i] // 10 - 1) * 3 + labels[i] % 10
         total_score[ture_label].append(top_simi[i] * mapping[labels[i]])
@@ -124,20 +125,40 @@ def get_label_score(text):
         if len(t_score) == 0 or sum(t_score) / len(t_score) < 6:
             avg_score.append(6)
         else:
-            if(len(t_score)<=3):
+            if len(t_score) <= 3:
                 avg_score.append(sum(t_score) / len(t_score))
             else:
-                sum_score=
+                t_score.sort(reverse=True)
+                sum_score = (t_score[0] + t_score[1] + t_score[2]) / 3
+                avg_score.append(sum_score)
     avg_score = [round(ascore, 2) for ascore in avg_score]
-
+    # 针对软实力而非硬实力
+    # 指标的由来：基于胜任力模型构建、以往文献，分层
+    # 针对商科、该领域
+    # 研究意义、创新点
     label = ['战略思维', '创造性思维', '逻辑思维', '行动力', '领导力', '沟通能力', '道德与责任', '社交导向', '抗挫力']
     weight = [10.99, 11.85, 11.92, 11.14, 10.94, 11.84, 11.19, 9.52, 10.61]
+    comment=['优秀','良好','合格']
+    label_cmt=[]
     label_score = []
     print(len(avg_score))
+
     for i in range(len(avg_score)):
-        label_score.append(label[i] + ":" + str(avg_score[i]) + "/" + str(weight[i]))
-    label_score.append('总计：' + str(round(sum(avg_score), 2)) + "/" + str(100))
-    return label_score, label_score
+        bili=avg_score[i]/weight[i]
+        if bili>=0.9:
+            label_cmt.append(label[i] + ": " +comment[0])
+        elif bili>=0.8:
+            label_cmt.append(label[i] + ": " +comment[1])
+        else :
+            avg_score[i]*=1.16
+            label_cmt.append(label[i] + ": " +comment[2])
+        # 可以再乘一个比例因子使得分数高点
+        if avg_score[i]/weight[i]<0.6:
+            label_score.append(label[i] + ": " + str(6) + "/" + str(10))
+        else:
+            label_score.append(label[i] + ": " + str(round(avg_score[i]/weight[i]*10,2)) + "/" + str(10))
+    label_score.append('总计：' + str(round(sum(avg_score)*100/90, 2))+ "/" + str(100)+"  (转为百分制)")
+    return label_score, label_cmt
 
 
 def split_the_text(text):
