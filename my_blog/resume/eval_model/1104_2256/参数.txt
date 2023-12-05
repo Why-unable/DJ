@@ -30,3 +30,24 @@ train_epochs = 200
 
 get_alpha = 0.1
 get_epochs = 100
+
+
+
+final_big
+train_vector_size = 20
+train_window = 8
+train_alpha = 0.01
+train_min_count = 1
+train_workers = 4
+train_epochs = 500
+
+get_alpha = 0.01
+get_epochs = 300
+
+# 定义模型超参数
+num_classes = 3  # 类别数量
+input_dim = train_vector_size
+hidden_dims = [60, 60, 60]# [256, 128, 64]
+dropout_rate = 0.4
+hidden_dim = 55
+output_dim = num_classes
