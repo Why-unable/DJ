@@ -67,12 +67,99 @@
                   {{ line|linebreaksbr }}
                 </div>
                 <br> <!-- 添加空行 -->
-              {% endfor %}
+            {% endfor %}
           </div>
         </div>
       </div>
     </div>
-  </div>
+
+        <button class="btn btn-primary" id="expandButton" type="button" onclick="toggleCard()">展开</button>
+        <div class="row mt-2" id="contentRow" style="display: none;">
+            {% for title,cmt in label_comment %}
+            <div class="col-4 mb-4">
+            <!-- 卡片容器 -->
+                <div class="card h-100">
+                    <h4 class="card-header">{{title}}</h4>
+                    <div class="card-body">
+                        <p class="card-text">{{cmt}}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <script>
+            function toggleCard() {
+                var contentRow = document.getElementById("contentRow");
+                var expandButton = document.getElementById("expandButton");
+
+                if (contentRow.style.display === "none") {
+                    contentRow.style.display = "flex";
+                    expandButton.innerText = "收起";
+                } else {
+                    contentRow.style.display = "none";
+                    expandButton.innerText = "展开";
+                }
+            }
+        </script>
+
+
+<!--    <button class="btn btn-primary" id="expandButton" type="button" onclick="toggleCard()">展开</button>-->
+
+<!--    <div id="buttonGroup" style="display: none;">-->
+<!--      <button class="btn btn-primary" type="button">创造性思维</button>-->
+<!--      <button class="btn btn-primary" type="button">战略思维</button>-->
+<!--      <button class="btn btn-primary" type="button">逻辑思维</button>-->
+<!--      <button class="btn btn-primary" type="button">行动力</button>-->
+<!--      <button class="btn btn-primary" type="button">领导力</button>-->
+<!--      <button class="btn btn-primary" type="button">沟通能力</button>-->
+<!--      <button class="btn btn-primary" type="button">道德与责任</button>-->
+<!--      <button class="btn btn-primary" type="button">社交导向</button>-->
+<!--      <button class="btn btn-primary" type="button">抗挫力</button>-->
+<!--      <button class="btn btn-primary" onclick="toggleTextbox('textbox6')">按钮6</button>-->
+
+<!--         <button class="btn btn-primary" id="collapseButtonDetail1" type="button" data-toggle="collapse" data-target="#collapseDetail" aria-expanded="false" aria-controls="collapseDetail" onclick="toggleButtonTextDetail(pow1,1)">-->
+<!--          按钮7-->
+<!--        </button>-->
+<!--        <div class="collapse" id="collapseDetail">-->
+<!--          <div class="card card-body">-->
+<!--&lt;!&ndash;            {% for line in comment %}&ndash;&gt;-->
+<!--&lt;!&ndash;                <div style="display: block;">&ndash;&gt;-->
+<!--&lt;!&ndash;                  {{ line|linebreaksbr }}&ndash;&gt;-->
+<!--&lt;!&ndash;                </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                <br> &lt;!&ndash; 添加空行 &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;            {% endfor %}&ndash;&gt;-->
+<!--                &lt;!&ndash; 使用全局变量控制要显示的评论元素 &ndash;&gt;-->
+<!--                <div style="display: block;" id="commentContent">-->
+
+<!--                </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      &lt;!&ndash; 在这里添加更多按钮 &ndash;&gt;-->
+<!--    </div>-->
+
+<!--    <div id="textbox6" style="display: none;">-->
+<!--          <textarea id="commentInput" placeholder="分数" style="height: auto">-->
+<!--              {% for line in comment %}-->
+<!--                {{ line }}-->
+<!--              {% endfor %}-->
+<!--          </textarea>-->
+<!--    </div>-->
+
+
+
+    <script>
+      function toggleButtonGroup() {
+        var buttonGroup = document.getElementById("buttonGroup");
+        if (buttonGroup.style.display === "none") {
+          buttonGroup.style.display = "block";
+        } else {
+          buttonGroup.style.display = "none";
+        }
+      }
+    </script>
+
+</div>
 
 
 
