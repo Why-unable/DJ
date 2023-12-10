@@ -81,7 +81,7 @@ def resume_analyse(request):
         text = "未选择文件"
         print(text)
     try:
-        text_label, avg_score, comment = get_label_score_origin(text)
+        text_label, avg_score, comment = get_label_score_version3(text)
     except Exception as e:
         text_label = ['something wrong']
         avg_score = ['something wrong']
@@ -161,8 +161,8 @@ def get_label_score_origin(text):
                 if t_score[0] - t_score[1] > 0.5:
                     sum_score += (t_score[0] - t_score[1]) * 0.3
                 if t_score[0] - t_score[2] > 1:
-                    sum_score += (t_score[0] - t_score[2]) * 0.5
-                if sum_score > t_score[0] * 3:
+                    sum_score += (t_score[0] - t_score[2]) * 0.3
+                if sum_score > (t_score[0] * 3):
                     sum_score = t_score[0] - 0.3
                 avg_score2.append(sum_score)
 
@@ -188,12 +188,12 @@ def get_label_score_origin(text):
             # 各
             if 0.65 <= bili <= 0.75:
                 avg_score2[i] *= (1.06 * (1 + (0.75 - bili)))
-            elif 0.6< bili < 0.65:
+            elif 0.6 < bili < 0.65:
                 avg_score2[i] *= 1.2
-            elif bili<0.6:
+            elif bili < 0.6:
                 avg_score2[i] = 6.65
             # 总
-            avg_score[i] *= 1.15
+            avg_score[i] *= 1.1
 
             label_cmt.append(label[i] + ": " + comment[2])
             label_comment_cmt.append(comment[2])
@@ -206,6 +206,7 @@ def get_label_score_origin(text):
 
     detail_comment = get_comment(label_comment_cmt)
     return label_score, label_cmt, detail_comment
+
 
 def get_label_score_old(text):
     split_text = split_the_text(text)
@@ -250,10 +251,27 @@ def get_label_score_old(text):
     # 研究意义、创新点
     label = ['战略思维', '创造性思维', '逻辑思维', '行动力', '领导力', '沟通能力', '道德与责任', '社交导向', '抗挫力']
     weight = [10.99, 11.85, 11.92, 11.14, 10.94, 11.84, 11.19, 9.52, 10.61]
-    comment=['优秀','良好','合格']
-    label_cmt=[]
+    comment = ['优秀', '良好', '合格']
+    label_cmt = []
     label_score = []
     print(len(avg_score))
+
+    for i in range(len(avg_score)):
+        bili = avg_score[i] / weight[i]
+        if bili >= 0.9:
+            label_cmt.append(label[i] + ": " + comment[0])
+        elif bili >= 0.8:
+            label_cmt.append(label[i] + ": " + comment[1])
+        else:
+            avg_score[i] *= 1.16
+            label_cmt.append(label[i] + ": " + comment[2])
+        # 可以再乘一个比例因子使得分数高点
+        if avg_score[i] / weight[i] < 0.6:
+            label_score.append(label[i] + ": " + str(6) + "/" + str(10))
+        else:
+            label_score.append(label[i] + ": " + str(round(avg_score[i] / weight[i] * 10, 2)) + "/" + str(10))
+    label_score.append('总计：' + str(round(sum(avg_score) * 100 / 90, 2)) + "/" + str(100) + "  (转为百分制)")
+    return label_score, label_cmt
 
 
 def get_comment(comment):
@@ -452,5 +470,114 @@ def read_doc_content(file_path):
     paragraphs = [p.text for p in doc.paragraphs]
     content = "\n".join(paragraphs)
     return content
+
+
+def get_label_score_version3(text):
+    split_text = split_the_text(text)
+    # 对于每一个句子，得到其分类：
+    text_label, text_simi, labels = get_label(split_text)
+    print(labels)
+    # 获取各个句子的相似度
+    top_simi = []
+    for i in range(len(text_simi)):
+        # 对于每个句子返回的相似度数组，取最高，也就是[0]的位置
+        top_simi.append(text_simi[i][0])
+
+    # 各个类别中，同一类别的各个句子的最高相似度的集合被放在total_score的一个位置
+    total_score = [[], [], [], [], [], [], [], [], []]
+
+    # 加载映射文件并创建字典
+    mapping_file = "resume/eval_model/weight.txt"
+    mapping = {}
+    with open(mapping_file, "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                # 标签与权重的对应关系
+                label, weight = line.split(",", 1)
+                mapping[int(label)] = float(weight)
+    for i in range(len(top_simi)):
+        true_label = (labels[i] // 10 - 1) * 3 + labels[i] % 10
+        total_score[true_label].append(top_simi[i] * mapping[labels[i]])
+
+    # 求每个类别的前三平均
+    avg_score = []
+    avg_score2 = []
+    for t_score in total_score:
+        if len(t_score) == 0 or sum(t_score) / len(t_score) < 6:
+            avg_score.append(6)
+        else:
+            if len(t_score) <= 3:
+                avg_score.append(sum(t_score) / len(t_score))
+            else:
+                print("good")
+                t_score.sort(reverse=True)
+                sum_score = (t_score[0] + t_score[1] + t_score[2]) / 3
+                avg_score.append(sum_score)
+
+        # 上述是总分显示
+        # 下述是各分
+        if len(t_score) == 0 or sum(t_score) / len(t_score) < 6:
+            avg_score2.append(6)
+        else:
+            if len(t_score) < 3:
+                bi = 0
+                if len(t_score) == 2:
+                    bi = 0.95
+                elif len(t_score) == 1:
+                    bi = 0.88
+                avg_score2.append(sum(t_score) * bi / len(t_score))
+            else:
+                t_score.sort(reverse=True)
+                sum_score = (t_score[0] + t_score[1] + t_score[2]) / 3
+                if t_score[0] - t_score[1] > 0.5:
+                    sum_score += (t_score[0] - t_score[1]) * 0.3
+                if t_score[0] - t_score[2] > 1:
+                    sum_score += (t_score[0] - t_score[2]) * 0.3
+                if sum_score > (t_score[0] * 3):
+                    sum_score = t_score[0] - 0.3
+                avg_score2.append(sum_score)
+
+    avg_score = [round(ascore, 2) for ascore in avg_score]
+    avg_score2 = [round(ascore2, 2) for ascore2 in avg_score2]
+
+    label = ['战略思维', '创造性思维', '逻辑思维', '行动力', '领导力', '沟通能力', '道德与责任', '社交导向', '抗挫力']
+    weight = [10.99, 11.85, 11.92, 11.14, 10.94, 11.84, 11.19, 9.52, 10.61]
+    comment = ['优秀', '良好', '合格']
+    label_cmt = []
+    label_score = []
+    print(len(avg_score))
+    label_comment_cmt = []
+    for i in range(len(avg_score2)):
+        bili = avg_score2[i] / weight[i]
+        if bili >= 0.9:
+            label_cmt.append(label[i] + ": " + comment[0])
+            label_comment_cmt.append(comment[0])
+        elif bili >= 0.8:
+            label_cmt.append(label[i] + ": " + comment[1])
+            label_comment_cmt.append(comment[1])
+        else:
+            # 各
+            if 0.65 <= bili <= 0.75:
+                avg_score2[i] *= (1.06 * (1 + (0.75 - bili)))
+            elif 0.6 < bili < 0.65:
+                avg_score2[i] *= 1.2
+            elif bili < 0.6:
+                avg_score2[i] = 6.65
+            # 总
+        if avg_score[i] / weight[i] < 0.8:
+            avg_score[i] *= 1.125
+
+            label_cmt.append(label[i] + ": " + comment[2])
+            label_comment_cmt.append(comment[2])
+        # 可以再乘一个比例因子使得分数高点
+        if avg_score2[i] / weight[i] < 0.6:
+            label_score.append(label[i] + ": " + str(6.65) + "/" + str(10))
+        else:
+            label_score.append(label[i] + ": " + str(round(avg_score2[i] / weight[i] * 10, 2)) + "/" + str(10))
+    label_score.append('总计：' + str(round(sum(avg_score) * 100 / 90, 2)) + "/" + str(100) + "  (转为百分制)")
+
+    detail_comment = get_comment(label_comment_cmt)
+    return label_score, label_cmt, detail_comment
 
 # ===================  两行等号内的函数为resume_analyse服务  =====================
