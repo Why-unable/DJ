@@ -558,6 +558,8 @@ def get_label_score_version3(text):
             label_comment_cmt.append(comment[1])
         else:
             # 各
+            label_cmt.append(label[i] + ": " + comment[2])
+            label_comment_cmt.append(comment[2])
             if 0.65 <= bili <= 0.75:
                 avg_score2[i] *= (1.06 * (1 + (0.75 - bili)))
             elif 0.6 < bili < 0.65:
@@ -568,8 +570,6 @@ def get_label_score_version3(text):
         if avg_score[i] / weight[i] < 0.8:
             avg_score[i] *= 1.125
 
-            label_cmt.append(label[i] + ": " + comment[2])
-            label_comment_cmt.append(comment[2])
         # 可以再乘一个比例因子使得分数高点
         if avg_score2[i] / weight[i] < 0.6:
             label_score.append(label[i] + ": " + str(6.65) + "/" + str(10))
