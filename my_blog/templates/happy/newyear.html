@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>倒计时</title>
+  <!-- 添加 Bootstrap 的 CSS 文件 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.5.3/dist/css/bootstrap.min.css">
+  <style>
+    /* 自定义样式 */
+    .countdown-container {
+      text-align: center;
+      margin-top: 100px;
+    }
+    .countdown {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 20px;
+    }
+  </style>
+  <script>
+    // 定义目标日期
+    var targetDate = new Date("January 1, 2024 00:00:00").getTime();
+
+    // 更新倒计时
+    function updateCountdown() {
+      // 获取当前日期和时间
+      var currentDate = new Date().getTime();
+
+      // 计算剩余时间
+      var remainingTime = targetDate - currentDate;
+
+      // 计算剩余时间的天、小时、分钟和秒数
+      var days = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+      // 显示倒计时
+      document.getElementById("countdown").innerHTML = days + " 天 " + hours + " 小时 " + minutes + " 分钟 " + seconds + " 秒 ";
+
+      // 每秒更新一次倒计时
+      setTimeout(updateCountdown, 1000);
+    }
+
+    // 页面加载完成后开始倒计时
+    window.onload = function() {
+      updateCountdown();
+    };
+  </script>
+</head>
+<body>
+  <div class="container">
+    <div class="countdown-container">
+      <h1 class="text-center">倒计时</h1>
+      <div id="countdown" class="countdown"></div>
+    </div>
+  </div>
+
+  <!-- 添加 Bootstrap 的 JavaScript 文件 -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
